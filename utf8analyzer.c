@@ -4,38 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        printf("Usage: utf8analyzer \"<UTF-8 encoded string>\"\n");
-        return 1;
-    }
-
-    const char *input = argv[1];
-
-    printf("ASCII? %s\n", is_valid_ascii(input) ? "yes" : "no");
-
-    printf("Uppercase: ");
-    print_uppercase(input);
-
-    printf("Bytes: %d\n", count_bytes(input));
-
-    printf("Codepoints: %d\n", count_codepoints(input));
-
-    printf("Codepoints and lengths:\n");
-    print_codepoints_and_lengths(input);
-
-    printf("First 6 codepoints: ");
-    print_first_six_codepoints(input);
-
-    printf("Animal emojis: ");
-    print_animal_emojis(input);
-
-    printf("Codepoint+1 at index 3: ");
-    print_codepoint_plus_one_at_index3(input);
-
-    return 0;
-}
-
 
 int read_codepoint(const char *str, int *bytes_used) {
     unsigned char byte = str[0];
@@ -127,4 +95,77 @@ void print_codepoint_plus_one_at_index3(const char *str) {
         index++;
     }
     printf("(Index 3 not found)\n");
+    // implement the UTF-8 analyzer here
+
+}
+bool is_valid_ascii(const char *str) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        if ((unsigned char)str[i] > 127) return false;
+    }
+    return true;
+}
+
+
+void print_uppercase(const char *str) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        char c = str[i];
+        if ('a' <= c && c <= 'z') {
+            printf("%c", c - 32);
+        } else {
+            printf("%c", c);
+        }
+    }
+    printf("\n");
+}
+
+
+int count_bytes(const char *str) {
+    return strlen(str);
+}
+
+
+int count_codepoints(const char *str) {
+    int count = 0;
+    for (int i = 0; str[i] != '\0';) {
+        unsigned char byte = str[i];
+        if ((byte & 0x80) == 0) i += 1;
+        else if ((byte & 0xE0) == 0xC0) i += 2;
+        else if ((byte & 0xF0) == 0xE0) i += 3;
+        else if ((byte & 0xF8) == 0xF0) i += 4;
+        else return -1; // invalid UTF-8
+        count++;
+    }
+    return count;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Usage: utf8analyzer \"<UTF-8 encoded string>\"\n");
+        return 1;
+    }
+
+    const char *input = argv[1];
+
+    printf("ASCII? %s\n", is_valid_ascii(input) ? "yes" : "no");
+
+    printf("Uppercase: ");
+    print_uppercase(input);
+
+    printf("Bytes: %d\n", count_bytes(input));
+
+    printf("Codepoints: %d\n", count_codepoints(input));
+
+    printf("Codepoints and lengths:\n");
+    print_codepoints_and_lengths(input);
+
+    printf("First 6 codepoints: ");
+    print_first_six_codepoints(input);
+
+    printf("Animal emojis: ");
+    print_animal_emojis(input);
+
+    printf("Codepoint+1 at index 3: ");
+    print_codepoint_plus_one_at_index3(input);
+
+    return 0;
 }

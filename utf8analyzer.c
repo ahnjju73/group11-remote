@@ -36,23 +36,22 @@ bool is_animal_emoji(int codepoint) {
 void print_codepoints_and_lengths(const char *str) {
     int i = 0;
     while (str[i] != '\0') {
-        int bytes = 0;
+	int bytes = 0;
         int codepoint = read_codepoint(&str[i], &bytes);
-        printf("%d (%d bytes)\n", codepoint, bytes);
+        printf("%d ", codepoint);
         i += bytes;
     }
+    printf("\n");
 }
 
-void print_first_six_codepoints(const char *str) {
-    int i = 0, count = 0;
-    while (str[i] != '\0' && count < 6) {
+void print_bytes_per_codepoint(const char *str) {
+    printf("Bytes per code point:\n");
+    int i = 0;
+    while (str[i] != '\0') {
         int bytes = 0;
-        int cp = read_codepoint(&str[i], &bytes);
-        for (int j = 0; j < bytes; j++) {
-            printf("%c", str[i + j]);
-        }
+        read_codepoint(&str[i], &bytes);
+        printf("%d ", bytes);
         i += bytes;
-        count++;
     }
     printf("\n");
 }
@@ -138,6 +137,20 @@ int count_codepoints(const char *str) {
     return count;
 }
 
+void print_first_six_codepoints(const char *str) {
+    int i = 0, count = 0;
+    while (str[i] != '\0' && count < 6) {
+        int bytes = 0;
+        int cp = read_codepoint(&str[i], &bytes);
+        for (int j = 0; j < bytes; j++) {
+            printf("%c", str[i + j]);
+        }
+        i += bytes;
+        count++;
+    }
+    printf("\n");
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         printf("Usage: utf8analyzer \"<UTF-8 encoded string>\"\n");
@@ -146,19 +159,22 @@ int main(int argc, char *argv[]) {
 
     const char *input = argv[1];
 
-    printf("ASCII? %s\n", is_valid_ascii(input) ? "yes" : "no");
+    printf("Valid ASCII: %s\n", is_valid_ascii(input) ? "true" : "false");
 
-    printf("Uppercase: ");
+    printf("Uppercased ASCII: ");
     print_uppercase(input);
 
-    printf("Bytes: %d\n", count_bytes(input));
+    printf("Length in bytes: %d\n", count_bytes(input));
 
-    printf("Codepoints: %d\n", count_codepoints(input));
+    printf("Number of code points: %d\n", count_codepoints(input));
 
-    printf("Codepoints and lengths:\n");
+    printf("Code points as decimal numbers: ");
     print_codepoints_and_lengths(input);
 
-    printf("First 6 codepoints: ");
+    printf("Bytes per code point: ");
+    print_bytes_per_codepoint(input);
+
+    printf("Substring of the first 6 code points: ");
     print_first_six_codepoints(input);
 
     printf("Animal emojis: ");
